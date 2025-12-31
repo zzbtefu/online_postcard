@@ -1,0 +1,174 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url('bg.png');
+    /* Light elegant background */
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: soft-light;
+    background-color: #fcfaf2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Yu Mincho', serif;
+}
+
+.scene {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    perspective: 1500px;
+}
+
+/* Envelope Container */
+.envelope-wrapper {
+    position: absolute;
+    width: 300px;
+    /* Base width */
+    height: 200px;
+    /* Base height */
+    cursor: pointer;
+    transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    /* Bounce effect */
+    z-index: 10;
+    /* Center it initially is handled by flex parent, but we might move it */
+}
+
+/* Shared Texture for Envelope Parts */
+.envelope-back,
+.envelope-body,
+.envelope-flap {
+    position: absolute;
+    width: 100%;
+    background-image: url('texture.png');
+    background-size: 200px;
+    /* Texture scale */
+    background-color: #be0000;
+    /* Deep Red */
+    background-blend-mode: multiply;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Back Layer */
+.envelope-back {
+    height: 100%;
+    top: 0;
+    border-radius: 5px;
+    background-color: #8a0000;
+    /* Darker inside */
+    z-index: 1;
+}
+
+/* The Card */
+.card {
+    position: absolute;
+    width: 90%;
+    height: 90%;
+    top: 5%;
+    left: 5%;
+    background: white;
+    z-index: 2;
+    overflow: hidden;
+    transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Front Pocket (Body) */
+.envelope-body {
+    height: 100%;
+    bottom: 0;
+    z-index: 3;
+    clip-path: polygon(0% 100%, 100% 100%, 100% 40%, 50% 65%, 0% 40%);
+    /* Makes a V shape pocket */
+    border-radius: 0 0 5px 5px;
+}
+
+/* Flap */
+.envelope-flap {
+    top: 0;
+    height: 55%;
+    /* Needs to overlap the pocket dip */
+    z-index: 4;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    /* Triangle pointing down */
+    transform-origin: top;
+    transition: transform 0.6s ease-in-out, z-index 0.6s linear;
+    border-radius: 5px 5px 0 0;
+    /* Add a slight brightness to separate from body */
+    filter: brightness(1.1);
+}
+
+/* --- Animation States --- */
+
+/* 1. Move Down & Scale Down slightly to look like it's going away/to hand */
+.envelope-wrapper.drop-down {
+    transform: translateY(35vh) scale(0.8) rotate(5deg);
+}
+
+/* 2. Open Flap */
+.envelope-wrapper.open .envelope-flap {
+    transform: rotateX(180deg);
+    z-index: 1;
+    /* Move behind card after opening */
+}
+
+/* 3. Eject Card */
+.envelope-wrapper.eject .card {
+    transform: translateY(-120%) scale(1.1);
+    /* Slide up and pop out */
+    z-index: 5;
+    /* Go above everything */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* 4. Fullscreen Overlay (Fade In) */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    z-index: 100;
+}
+
+.overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+    /* Gold glow */
+    transform: scale(0.8);
+    transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.overlay.visible img {
+    transform: scale(1);
+}
